@@ -1,0 +1,64 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Employee Master
+    link(rel="stylesheet", href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css")
+
+  body
+    div.container
+      h1 Employee Master
+      table.table#employeesTable
+        thead
+          tr
+            th ID
+            th Name
+            th Active
+            th Actions
+        tbody
+
+    script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+    script(src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js")
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js")
+    script.
+      $(document).ready(function() {
+        $('#employeesTable').DataTable({
+          ajax: {
+            url: '/api/employees',
+            dataSrc: ''
+          },
+          columns: [
+            { data: 'id' },
+            { data: 'name' },
+            { data: 'isActive', render: function(data) {
+                return data ? 'Yes' : 'No';
+              }
+            },
+            { data: null, render: function(data) {
+                return '<a class="btn btn-info" href="/employees/' + data.id + '/edit">Edit</a>' +
+                       '<button class="btn btn-danger btn-delete" data-id="' + data.id + '" type="button">Delete</button>';
+              }
+            }
+          ]
+        });
+        
+        // Handle delete button click
+        $('#employeesTable').on('click', '.btn-delete', function() {
+          const employeeId = $(this).data('id');
+          if (confirm('Are you sure you want to delete this employee?')) {
+            $.ajax({
+              url: '/api/employees/' + employeeId,
+              method: 'DELETE',
+              success: function(response) {
+                alert('Employee deleted successfully.');
+                $('#employeesTable').DataTable().ajax.reload();
+              },
+              error: function(error) {
+                alert('Failed to delete the employee.');
+              }
+            });
+          }
+        });
+      });

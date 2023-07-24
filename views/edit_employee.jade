@@ -1,0 +1,44 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Edit Employee
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  body
+    div.container
+      h1 Edit Employee
+      form(id="editEmployeeForm", action=`/api/employees/${employee.id}`, method="PUT")
+        //- input(type="hidden", name="_method", value="PUT") 
+        label(for="name") Name:
+        input(type="text", id="name", name="name", value=`${employee.name}`, required)
+        label(for="isActive") Active:
+        input(type="checkbox", id="isActive", name="isActive", checked=`${employee.isActive}`)
+        button.btn.btn-primary(type="Submit") Save Changes
+
+    script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js")
+    script.
+      //handle form submission
+      $(document).ready(function() {
+        $('#editEmployeeForm').submit(function(event) {
+          event.preventDefault(); 
+          const formData = $(this).serialize();
+          const employeeId = $(this).attr('action').split('/').pop();
+
+          // Send a PUT request using AJAX
+          $.ajax({
+            url: `/api/employees/${employeeId}`,
+            method: 'PUT',
+            data: formData,
+            success: function(response) {
+              alert('Employee updated successfully.');
+              window.location.href = '/employees';
+            },
+            error: function(error) {
+              alert('Failed to update the employee.');
+            }
+          });
+        });
+      });
